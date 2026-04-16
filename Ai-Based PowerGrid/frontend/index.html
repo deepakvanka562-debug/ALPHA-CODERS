@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DeepFrog AI R&D Platform</title>
+    <!-- React & ReactDOM -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <!-- Babel -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <!-- Axios -->
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Main Styling (Vanilla CSS) -->
+    <style>
+        :root {
+          --bg-dark: #0f172a;
+          --bg-card: rgba(30, 41, 59, 0.7);
+          --text-main: #f8fafc;
+          --text-muted: #94a3b8;
+          --accent-blue: #3b82f6;
+          --accent-cyan: #06b6d4;
+          --accent-green: #10b981;
+          --accent-yellow: #f59e0b;
+          --accent-neon-yellow: #ffff00; /* Perfect yellow highlight */
+          --accent-red: #ef4444;
+          --glass-border: rgba(255, 255, 255, 0.1);
+          --shadow-glow: 0 0 20px rgba(255, 255, 0, 0.15);
+        }
+
+        * {
+          margin: 0;
+          padding: 0;
+          box-sizing: border-box;
+          font-family: 'Inter', -apple-system, sans-serif;
+        }
+
+        body {
+          background-color: var(--bg-dark);
+          background-image: radial-gradient(circle at top right, rgba(234, 255, 0, 0.1), transparent 40%),
+                            radial-gradient(circle at bottom left, rgba(6, 182, 212, 0.05), transparent 40%);
+          color: var(--text-main);
+          min-height: 100vh;
+        }
+
+        .app-container {
+          max-width: 1200px;
+          margin: 0 auto;
+          padding: 2rem;
+        }
+
+        header {
+          margin-bottom: 3rem;
+          text-align: center;
+        }
+
+        h1 {
+          font-size: 2.5rem;
+          font-weight: 700;
+          color: var(--accent-neon-yellow);
+          text-shadow: 0 0 10px rgba(255, 255, 0, 0.4);
+          margin-bottom: 0.5rem;
+        }
+
+        .subtitle {
+          color: var(--text-muted);
+          font-size: 1.1rem;
+        }
+
+        .dashboard-layout {
+          display: grid;
+          grid-template-columns: 1fr 2fr;
+          gap: 2rem;
+        }
+
+        .glass-card {
+          background: var(--bg-card);
+          backdrop-filter: blur(12px);
+          border: 1px solid var(--glass-border);
+          border-radius: 16px;
+          padding: 2rem;
+          box-shadow: var(--shadow-glow);
+          transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .glass-card:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2), 0 0 20px rgba(234, 255, 0, 0.25);
+        }
+
+        h2.card-title {
+          font-size: 1.5rem;
+          margin-bottom: 1.5rem;
+          font-weight: 600;
+          border-bottom: 1px solid var(--glass-border);
+          padding-bottom: 0.75rem;
+        }
+
+        .form-group {
+          margin-bottom: 1.5rem;
+        }
+
+        label {
+          display: block;
+          font-size: 0.9rem;
+          font-weight: 500;
+          color: var(--text-muted);
+          margin-bottom: 0.5rem;
+        }
+
+        input[type="number"], input[type="text"], select {
+          width: 100%;
+          background: rgba(15, 23, 42, 0.6);
+          border: 1px solid var(--glass-border);
+          color: var(--text-main);
+          padding: 0.75rem 1rem;
+          border-radius: 8px;
+          outline: none;
+          font-size: 1rem;
+          transition: border-color 0.2s;
+        }
+
+        input:focus, select:focus {
+          border-color: var(--accent-neon-yellow);
+          box-shadow: 0 0 0 2px rgba(234, 255, 0, 0.2);
+        }
+
+        .btn-primary {
+          width: 100%;
+          background: var(--accent-neon-yellow);
+          color: #000;
+          border: none;
+          padding: 1rem;
+          border-radius: 8px;
+          font-size: 1.1rem;
+          font-weight: 600;
+          cursor: pointer;
+          transition: opacity 0.2s, transform 0.1s;
+        }
+
+        .btn-primary:hover { opacity: 0.9; }
+        .btn-primary:active { transform: scale(0.98); }
+        .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        .results-grid {
+          display: grid;
+          grid-template-columns: repeat(2, 1fr);
+          gap: 1.5rem;
+          margin-bottom: 2rem;
+        }
+
+        .metric-card {
+          background: rgba(15, 23, 42, 0.4);
+          border-radius: 12px;
+          padding: 1.5rem;
+          text-align: center;
+          border: 1px solid var(--glass-border);
+        }
+
+        .metric-value {
+          font-size: 2.5rem;
+          font-weight: 700;
+          margin: 0.5rem 0;
+        }
+
+        .metric-label {
+          color: var(--text-muted);
+          font-size: 0.9rem;
+          text-transform: uppercase;
+          letter-spacing: 1px;
+        }
+
+        .risk-color { font-size: 2rem; font-weight: bold; margin-bottom: 1rem;}
+        .risk-LOW { color: var(--accent-green); }
+        .risk-MEDIUM { color: var(--accent-yellow); }
+        .risk-HIGH { color: var(--accent-red); }
+
+        .recommendations-list {
+          list-style: none;
+        }
+
+        .recommendations-list li {
+          background: rgba(255, 255, 255, 0.05);
+          margin-bottom: 0.75rem;
+          padding: 1rem;
+          border-radius: 8px;
+          border-left: 4px solid var(--accent-cyan);
+          display: flex;
+          align-items: center;
+        }
+
+        .recommendations-list li::before {
+          content: '👉';
+          margin-right: 10px;
+        }
+
+        .empty-state {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          height: 100%;
+          min-height: 400px;
+          color: var(--text-muted);
+          text-align: center;
+        }
+
+        @media (max-width: 900px) {
+          .dashboard-layout { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <!-- React App Logic via Babel -->
+    <script type="text/babel">
+        const { useState } = React;
+
+        function InputForm({ onSubmit, loading }) {
+            const [formData, setFormData] = useState({
+                zone_name: 'Zone A',
+                load_percentage: 50,
+                temperature: 25,
+                weather_condition: 'Clear',
+                equipment_health: 'Good',
+                maintenance_delay: 'No'
+            });
+
+            const handleChange = (e) => {
+                const { name, value } = e.target;
+                setFormData(prev => ({ ...prev, [name]: value }));
+            };
+
+            const handleSubmit = (e) => {
+                e.preventDefault();
+                onSubmit(formData);
+            };
+
+            return (
+                <form onSubmit={handleSubmit}>
+                    <div className="form-group">
+                        <label>Zone Name</label>
+                        <input type="text" name="zone_name" value={formData.zone_name} onChange={handleChange} required />
+                    </div>
+                    <div className="form-group">
+                        <label>Load Percentage (0-100%)</label>
+                        <input type="number" name="load_percentage" min="0" max="100" value={formData.load_percentage} onChange={handleChange} required />
+                    </div>
+                    <div className="form-group">
+                        <label>Temperature (°C)</label>
+                        <input type="number" name="temperature" value={formData.temperature} onChange={handleChange} required />
+                    </div>
+                    <div className="form-group">
+                        <label>Weather Condition</label>
+                        <select name="weather_condition" value={formData.weather_condition} onChange={handleChange}>
+                            <option value="Clear">Clear</option>
+                            <option value="Rain">Rain</option>
+                            <option value="Storm">Storm</option>
+                        </select>
+                    </div>
+                    <div className="form-group">
+                        <label>Equipment Health</label>
+                        <select name="equipment_health" value={formData.equipment_health} onChange={handleChange}>
+                            <option value="Good">Good</option>
+                            <option value="Moderate">Moderate</option>
+                            <option value="Poor">Poor</option>
+                        </select>
+                    </div>
+                    <div className="form-group">
+                        <label>Maintenance Delay</label>
+                        <select name="maintenance_delay" value={formData.maintenance_delay} onChange={handleChange}>
+                            <option value="No">No</option>
+                            <option value="Yes">Yes</option>
+                        </select>
+                    </div>
+                    <button type="submit" className="btn-primary" disabled={loading}>
+                        {loading ? 'Analyzing...' : 'Predict Risk'}
+                    </button>
+                </form>
+            );
+        }
+
+        function Dashboard({ data, loading }) {
+            if (loading) return (
+                <div className="empty-state">
+                    <h3>⚙️ AI Engine Processing...</h3>
+                    <p>Analyzing historical data and running simulations.</p>
+                </div>
+            );
+
+            if (!data) return (
+                <div className="empty-state">
+                    <h3 style={{fontSize: '3rem'}}>📊</h3>
+                    <h3>Waiting for Input</h3>
+                    <p>Enter parameters on the left to predict grid risk.</p>
+                </div>
+            );
+
+            let riskGlow = 'rgba(16, 185, 129, 0.4)';
+            if (data.risk_level === 'MEDIUM') riskGlow = 'rgba(245, 158, 11, 0.4)';
+            else if (data.risk_level === 'HIGH') riskGlow = 'rgba(239, 68, 68, 0.4)';
+
+            return (
+                <div className="dashboard-content">
+                    <div className="results-grid">
+                        <div className="metric-card" style={{ boxShadow: `0 0 20px ${riskGlow}` }}>
+                            <div className="metric-label">Failure Probability</div>
+                            <div className={`metric-value risk-${data.risk_level}`}>
+                                {data.failure_probability}%
+                            </div>
+                            <h3 className={`risk-${data.risk_level}`}>{data.risk_level} RISK</h3>
+                        </div>
+
+                        <div className="metric-card">
+                            <div className="metric-label">Est. Restoration Delay</div>
+                            <div className="metric-value">
+                                {data.expected_delay_hours} <span style={{fontSize: '1rem', color: 'var(--text-muted)'}}>hrs</span>
+                            </div>
+                            <div style={{ marginTop: '2rem' }}>
+                                <div className="metric-label">Zone</div>
+                                <h3 style={{marginTop: '0.5rem'}}>{data.zone_name}</h3>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="recommendations-box">
+                        <h3 style={{marginBottom: '1rem'}}>AI Recommendations</h3>
+                        <ul className="recommendations-list">
+                            {data.recommendations && data.recommendations.map((rec, idx) => (
+                                <li key={idx}>{rec}</li>
+                            ))}
+                        </ul>
+                    </div>
+                </div>
+            );
+        }
+
+        function App() {
+            const [prediction, setPrediction] = useState(null);
+            const [loading, setLoading] = useState(false);
+            const [error, setError] = useState(null);
+            const [token, setToken] = useState(null);
+
+            // Fetch generic user token on mount
+            React.useEffect(() => {
+                axios.post('http://127.0.0.1:5000/login', {username: 'testuser', password: 'pwd'})
+                     .then(res => setToken(res.data.access_token))
+                     .catch(err => console.error("Could not authenticate", err));
+            }, []);
+
+            const handlePredict = async (formData) => {
+                if (!token) {
+                    setError("Not authenticated yet. Waiting for Auth server.");
+                    return;
+                }
+                setLoading(true);
+                setError(null);
+                try {
+                    const response = await axios.post('http://127.0.0.1:5000/predict', formData, {
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    });
+                    const taskId = response.data.task_id;
+
+                    const poll = setInterval(async () => {
+                        try {
+                            const statusRes = await axios.get(`http://127.0.0.1:5000/task-status/${taskId}`, {
+                                headers: { 'Authorization': `Bearer ${token}` }
+                            });
+                            if (statusRes.data.status === 'finished') {
+                                clearInterval(poll);
+                                setPrediction(statusRes.data);
+                                setLoading(false);
+                            } else if (statusRes.data.status === 'failed') {
+                                clearInterval(poll);
+                                setError("Asynchronous worker failed to process the job.");
+                                setLoading(false);
+                            }
+                        } catch (e) {
+                            clearInterval(poll);
+                            setError("Task polling error");
+                            setLoading(false);
+                        }
+                    }, 1000);
+
+                } catch (err) {
+                    console.error(err);
+                    setError("Prediction failed! Make sure the Backend and Redis worker are running.");
+                    setLoading(false);
+                }
+            };
+
+            return (
+                <div className="app-container">
+                    <header>
+                        <h1>DeepFrog AI R&D Platform</h1>
+                        <p className="subtitle">Real-time Advanced Modeling & Delay Prediction</p>
+                    </header>
+                    <main className="dashboard-layout">
+                        <div className="glass-card">
+                            <h2 className="card-title">Grid Parameters</h2>
+                            <InputForm onSubmit={handlePredict} loading={loading} />
+                            {error && <p style={{color: 'var(--accent-red)', marginTop: '1rem'}}>{error}</p>}
+                        </div>
+                        <div className="glass-card">
+                            <h2 className="card-title">Analysis & Insights</h2>
+                            <Dashboard data={prediction} loading={loading} />
+                        </div>
+                    </main>
+                </div>
+            );
+        }
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
